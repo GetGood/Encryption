@@ -49,6 +49,14 @@ func decrypt(key []byte, text []byte) ([]byte){
 }
 
 func encrypt(key []byte, text []byte) ([]byte) {
+  now := time.Now()
+  seed := (now.Nanosecond())
+  fmt.Println("seed:", seed)
+  rand.Seed(int64(seed))
+
+  ivbyte := make([]byte, 1)
+  ivchar := ""
+  ivnum := 0
   block, err := aes.NewCipher(key)
   if err != nil {
     panic(err)
@@ -58,6 +66,20 @@ func encrypt(key []byte, text []byte) ([]byte) {
   // include it at the beginning of the ciphertext.
   ciphertext := make([]byte, aes.BlockSize+len(text))
   iv := ciphertext[:aes.BlockSize]
+
+  for i := 0; i < len(iv); {
+    ivchar = (strconv.Itoa(rand.Int()))[0:3]
+    ivnum,_ = strconv.Atoi(ivchar)
+    if ivnum > 32 && ivnum < 127 {
+      ivchar = string(ivnum)
+      ivbyte = []byte(ivchar)
+      iv[i] = ivbyte[0]
+      i++
+    } else {
+      continue
+    }
+  }
+  fmt.Println(iv)
 
   stream := cipher.NewCFBEncrypter(block, iv)
   stream.XORKeyStream(ciphertext[aes.BlockSize:], text)
@@ -95,3 +117,4 @@ func generateKey() ([]byte) {
   }
   return key
 }
+
