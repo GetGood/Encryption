@@ -9,35 +9,73 @@ import (
   "crypto/cipher"
   "log"
   "os"
+  "io/ioutil"
 )
 
 func main() {
-  originaltext := []byte("hello world! I like to get encrypted sometimes")
-  cipherstring := os.Args[1]
+  // read original and encrypted file paths
+  cipherpath := os.Args[1]
+  originalpath := os.Args[2]
 
+  // read the files into byte slices
+  cipherslice, err := ioutil.ReadFile(cipherpath)
+  check(err)
+
+  original, err := ioutil.ReadFile(originalpath)
+  check(err)
+
+  // check for and remove line feed character LF
+  if (cipherslice[len(cipherslice)-1] == 10) {
+    cipherslice = cipherslice[:len(cipherslice)-1]
+  }
+
+  if (original[len(original)-1] == 10) {
+    original = original[:len(original)-1]
+  }
+
+  ciphertext := hex.EncodeToString(cipherslice)
+  fmt.Println(ciphertext)
+
+  // feed the cipher slice to function as string.
+  // it will be decoded later
+  bruteforce(original, ciphertext)
+}
+
+// error checking function
+func check(e error) {
+  if e != nil {
+    log.Fatal(e)
+  }
+}
+
+func bruteforce (original []byte, cipher string) {
+  // bruteforcing all possible keys
+  // very simplistic progress bar
+  fmt.Println("___________________ Done")
+  fmt.Print(":")
   for i := 1; i <= 999999999; i++ {
-    if i%10000 == 0 {
-      fmt.Println(i, "rounds done")
-    }
-    ciphertext, err := hex.DecodeString(cipherstring)
-    if err != nil {
-      log.Fatal(err)
+    if i%50000000 == 0 {
+      fmt.Print(":")
     }
 
     key := generateKey(i)
+    testcipher, err := hex.DecodeString(cipher)
+    check(err)
 
-    plaintext := decrypt(key, ciphertext)
+    plain := decrypt(key, testcipher)
 
-    if compareSlices(originaltext, plaintext) != false {
+    if compareSlices(original, plain) != false {
+      fmt.Println()
       fmt.Println("key found! key:", hex.EncodeToString(key))
       fmt.Println(key)
       fmt.Print("plaintext: ")
-      fmt.Printf("%s\n", plaintext)
+      fmt.Printf("%s\n", plain)
       break
     }
   }
 }
 
+// decrypt function
 func decrypt(key []byte, text []byte) ([]byte){
   block, err := aes.NewCipher(key)
   if err != nil {
@@ -72,9 +110,7 @@ func generateKey(seed int) ([]byte) {
     keychar = (strconv.Itoa(rand.Int()))[0:3]
     keynum,_ = strconv.Atoi(keychar)
     if keynum > 32 && keynum < 127 {
-      //fmt.Println(keynum)
       keychar = string(keynum)
-      //fmt.Println(keychar)
       keybyte = []byte(keychar)
       key[i] = keybyte[0]
       i++
@@ -86,15 +122,18 @@ func generateKey(seed int) ([]byte) {
 }
 
 func compareSlices(original []byte, test []byte) (bool) {
+  // if slices are different lengths no more checking
+  // is required
   if len(original) != len(test) {
     return false
   }
 
+  // loop through every byte of the slices
   for i, char := range original {
     if char != test[i] {
       return false
     }
   }
-
   return true
 }
+
