@@ -7,23 +7,65 @@ import (
   "strconv"
   "crypto/aes"
   "crypto/cipher"
-  "encoding/hex"
+ // "encoding/hex"
+  "io/ioutil"
+  "os"
+  "log"
+  "flag"
 )
 
 func main() {
-  key := generateKey()
-  fmt.Println("key:", hex.EncodeToString(key))
-  fmt.Println(key)
 
-  originaltext := []byte("hello world! I like to get encrypted sometimes")
 
-  ciphertext := encrypt(key, originaltext)
-  fmt.Println("ciphertext:", hex.EncodeToString(ciphertext))
+ 
+	key := generateKey()
+	decryptPtr := flag.Bool("d", false, "option to decrypt")
+	encryptPtr := flag.Bool("e", false, "option to encrypt")
+	flag.Parse()
+	if (*encryptPtr == true) {
+		originalpath := os.Args[2]
+		originaltext, err := ioutil.ReadFile(originalpath)
+		check(err)
+		ciphertext := encrypt(key, originaltext)
+		err = ioutil.WriteFile("./results.txt", ciphertext, 0644)
+		if err != nil {
+		panic(err)
+	}
+  } else if (*decryptPtr == true) {
+		originalpath := os.Args[2]
+		 originaltext, err := ioutil.ReadFile(originalpath)
+		 check(err)
+	 
+		plaintext := decrypt(key, originaltext)
+		err = ioutil.WriteFile("./plainnsimple.txt", plaintext, 0644)
+			if err != nil {
+			panic(err)
+  }
+  } else {
+    fmt.Println("Invalid command line option, use")
+    fmt.Println("-d for decrypt, -e for encrypt")
+}
 
-  plaintext := decrypt(key, ciphertext)
+  
+  
+//  fmt.Println("key:", hex.EncodeToString(key))
+  //fmt.Println(key)
 
-  fmt.Print("plaintext: ")
-  fmt.Printf("%s\n", plaintext)
+  
+
+
+ // fmt.Println("ciphertext:", hex.EncodeToString(ciphertext))
+	//fmt.Println("yoyoyo:", ciphertext)
+  
+
+ // fmt.Print("plaintext: ")
+ // fmt.Printf("%s\n", plaintext)
+
+}
+func check(e error) {
+  if e != nil {
+    log.Fatal(e)
+  }
 }
 
 func decrypt(key []byte, text []byte) ([]byte){
@@ -95,7 +137,7 @@ func generateKey() ([]byte) {
   now := time.Now()
   seed := (now.Nanosecond())
   fmt.Println("seed:", seed)
-  rand.Seed(int64(seed))
+  rand.Seed(int64(2000))
   key := make([]byte, 16)
   keychar := ""
   keybyte := make([]byte, 1)
@@ -117,4 +159,3 @@ func generateKey() ([]byte) {
   }
   return key
 }
-
