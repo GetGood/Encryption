@@ -19,33 +19,63 @@ func main() {
 
 	decryptPtr := flag.Bool("d", false, "option to decrypt")
 	encryptPtr := flag.Bool("e", false, "option to encrypt")
+	useKeyPtr := flag.Bool("k", false, "option to use key file")
 	flag.Parse()
 	if *encryptPtr == true {
 		originalpath := os.Args[2]
 		originaltext, err := ioutil.ReadFile(originalpath)
 		check(err)
+		// check for and remove line feed character LF
+		if originaltext[len(originaltext)-1] == 10 {
+		originaltext = originaltext[:len(originaltext)-1]
+    }
+		if *useKeyPtr == true{
+			keypath := os.Args[4]
+			keyfile, err := ioutil.ReadFile(keypath)
+			key, err := hex.DecodeString(string(keyfile))
+			check(err)
+			ciphertext := encrypt(key, originaltext)
+			err = ioutil.WriteFile("./"+originalpath + ".lit", ciphertext, 0644)
+		}else{
+		
 		key := generateKey()
 		err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
 		if err != nil {
 			panic(err)
 		}
-		
-		ciphertext := encrypt(key, originaltext)
-		err = ioutil.WriteFile("./"+os.Args[2] + ".lit", ciphertext, 0644)
+		}
 		if err != nil {
 			panic(err)
 		}
 	} else if *decryptPtr == true {
 		originalpath := os.Args[2]
-		key := generateKey()
 		originaltext, err := ioutil.ReadFile(originalpath)
 		check(err)
+		// check for and remove line feed character LF
+		if originaltext[len(originaltext)-1] == 10 {
+		originaltext = originaltext[:len(originaltext)-1]
+    }
 		filename := stripExtension(os.Args[2])
-		plaintext := decrypt(key, originaltext)
-		err = ioutil.WriteFile("./"+filename, plaintext, 0644)
-		if err != nil {
+		if *useKeyPtr == true{
+			keypath := os.Args[4]
+			keyfile, err := ioutil.ReadFile(keypath)
+			key, err := hex.DecodeString(string(keyfile))
+			check(err)
+			plaintext := decrypt(key, originaltext)
+			err = ioutil.WriteFile("./"+filename, plaintext, 0644)
+			if err != nil {
 			panic(err)
 		}
+		}else{
+			key := generateKey()
+			plaintext := decrypt(key, originaltext)
+			err = ioutil.WriteFile("./"+filename, plaintext, 0644)
+			if err != nil {
+			panic(err)
+		}
+		}
+
+		
 	} else {
 		fmt.Println("Invalid command line option, use")
 		fmt.Println("-d for decrypt, -e for encrypt")
