@@ -11,91 +11,89 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 func main() {
 
-	decryptPtr := flag.Bool("d", false, "option to decrypt")
-	encryptPtr := flag.Bool("e", false, "option to encrypt")
-	useKeyPtr := flag.Bool("k", false, "option to use key file")
+	decryptPtr := flag.String("d", "", "option to decrypt")
+	encryptPtr := flag.String("e", "", "option to encrypt")
+	useKeyPtr := flag.String("k", "", "option to use key file")
 	flag.Parse()
-	if *encryptPtr == true {
+
+	if *encryptPtr != "" && *useKeyPtr != "" {
+		originalpath := os.Args[2]
+		keypath := os.Args[4]
+		originaltext, err := ioutil.ReadFile(originalpath)
+		check(err)
+
+		// check for and remove line feed character LF
+		if originaltext[len(originaltext)-1] == 10 {
+			originaltext = originaltext[:len(originaltext)-1]
+		}
+		keyfile, err := ioutil.ReadFile(keypath)
+		key, err := hex.DecodeString(string(keyfile))
+		check(err)
+
+		ciphertext := encrypt(key, originaltext)
+		err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+		check(err)
+
+	} else if *encryptPtr != "" && *useKeyPtr == "" {
 		originalpath := os.Args[2]
 		originaltext, err := ioutil.ReadFile(originalpath)
 		check(err)
+
 		// check for and remove line feed character LF
 		if originaltext[len(originaltext)-1] == 10 {
-		originaltext = originaltext[:len(originaltext)-1]
-    }
-		if *useKeyPtr == true{
-			keypath := os.Args[4]
-			keyfile, err := ioutil.ReadFile(keypath)
-			key, err := hex.DecodeString(string(keyfile))
-			check(err)
-			ciphertext := encrypt(key, originaltext)
-			err = ioutil.WriteFile("./"+originalpath + ".lit", ciphertext, 0644)
-		}else{
-		
+			originaltext = originaltext[:len(originaltext)-1]
+		}
 		key := generateKey()
+		ciphertext := encrypt(key, originaltext)
+		err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+		if err != nil {
+			panic(err)
+		}
+
 		err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
 		if err != nil {
 			panic(err)
 		}
+	} else if *decryptPtr != "" && *useKeyPtr != "" {
+		originalpath := os.Args[2]
+		filename := stripExtension(os.Args[2])
+		keypath := os.Args[4]
+		originaltext, err := ioutil.ReadFile(originalpath)
+		check(err)
+
+		// check for and remove line feed character LF
+		if originaltext[len(originaltext)-1] == 10 {
+			originaltext = originaltext[:len(originaltext)-1]
 		}
+		keyfile, err := ioutil.ReadFile(keypath)
+		check(err)
+
+		key, err := hex.DecodeString(string(keyfile))
+		check(err)
+
+		plaintext := decrypt(key, originaltext)
+		err = ioutil.WriteFile("./"+filename, plaintext, 0644)
 		if err != nil {
 			panic(err)
 		}
-	} else if *decryptPtr == true {
-		originalpath := os.Args[2]
-		originaltext, err := ioutil.ReadFile(originalpath)
-		check(err)
-		// check for and remove line feed character LF
-		if originaltext[len(originaltext)-1] == 10 {
-		originaltext = originaltext[:len(originaltext)-1]
-    }
-		filename := stripExtension(os.Args[2])
-		if *useKeyPtr == true{
-			keypath := os.Args[4]
-			keyfile, err := ioutil.ReadFile(keypath)
-			key, err := hex.DecodeString(string(keyfile))
-			check(err)
-			plaintext := decrypt(key, originaltext)
-			err = ioutil.WriteFile("./"+filename, plaintext, 0644)
-			if err != nil {
-			panic(err)
-		}
-		}else{
-			key := generateKey()
-			plaintext := decrypt(key, originaltext)
-			err = ioutil.WriteFile("./"+filename, plaintext, 0644)
-			if err != nil {
-			panic(err)
-		}
-		}
-
-		
 	} else {
 		fmt.Println("Invalid command line option, use")
-		fmt.Println("-d for decrypt, -e for encrypt")
+		fmt.Println("-d for decrypt, -e for encrypt, specify keyfile with -k")
 	}
-
-	//  fmt.Println("key:", hex.EncodeToString(key))
-	//fmt.Println(key)
-
-	// fmt.Println("ciphertext:", hex.EncodeToString(ciphertext))
-	//fmt.Println("yoyoyo:", ciphertext)
-
-	// fmt.Print("plaintext: ")
-	// fmt.Printf("%s\n", plaintext)
-
 }
+
 func check(e error) {
 	if e != nil {
 		log.Fatal(e)
 	}
 }
+
 func stripExtension(s string) string {
 	n := strings.LastIndexByte(s, '.')
 	if n > 0 {
@@ -172,7 +170,7 @@ func generateKey() []byte {
 	now := time.Now()
 	seed := (now.Nanosecond())
 	fmt.Println("seed:", seed)
-	rand.Seed(int64(2000))
+	rand.Seed(int64(seed))
 	key := make([]byte, 16)
 	keychar := ""
 	keybyte := make([]byte, 1)
