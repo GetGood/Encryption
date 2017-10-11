@@ -70,6 +70,10 @@ func bruteforce (original []byte, cipher string) {
       fmt.Println(key)
       fmt.Print("plaintext: ")
       fmt.Printf("%s\n", plain)
+      err := ioutil.Writefile("newkey.lit", []byte(hex.EncodeToString(key)), 0644)
+      if err != nil {
+        panic(err)
+      }
       break
     }
   }
