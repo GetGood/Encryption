@@ -134,7 +134,7 @@ func encrypt(key []byte, text []byte) []byte {
 	for i := 0; i < len(iv); {
 		ivchar = (strconv.Itoa(rand.Int()))[0:3]
 		ivnum, _ = strconv.Atoi(ivchar)
-		if ivnum > 0 && ivnum < 127 {
+		if ivnum > 0 && ivnum < 128 {
 			ivchar = string(ivnum)
 			ivbyte = []byte(ivchar)
 			iv[i] = ivbyte[0]
