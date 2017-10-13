@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -115,12 +114,7 @@ func decrypt(key []byte, text []byte) []byte {
 func encrypt(key []byte, text []byte) []byte {
 	now := time.Now()
 	seed := (now.Nanosecond())
-	fmt.Println("seed:", seed)
 	rand.Seed(int64(seed))
-
-	ivbyte := make([]byte, 1)
-	ivchar := ""
-	ivnum := 0
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -131,19 +125,7 @@ func encrypt(key []byte, text []byte) []byte {
 	ciphertext := make([]byte, aes.BlockSize+len(text))
 	iv := ciphertext[:aes.BlockSize]
 
-	for i := 0; i < len(iv); {
-		ivchar = (strconv.Itoa(rand.Int()))[0:3]
-		ivnum, _ = strconv.Atoi(ivchar)
-		if ivnum > 0 && ivnum < 128 {
-			ivchar = string(ivnum)
-			ivbyte = []byte(ivchar)
-			iv[i] = ivbyte[0]
-			i++
-		} else {
-			continue
-		}
-	}
-	fmt.Println(iv)
+	rand.Read(iv)
 
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], text)
@@ -160,23 +142,6 @@ func generateKey() []byte {
 	fmt.Println("seed:", seed)
 	rand.Seed(int64(seed))
 	key := make([]byte, 16)
-	keychar := ""
-	keybyte := make([]byte, 1)
-	keynum := 0
-
-	for i := 0; i < 16; {
-		keychar = (strconv.Itoa(rand.Int()))[0:3]
-		keynum, _ = strconv.Atoi(keychar)
-		if keynum > 0 && keynum < 128 {
-			//fmt.Println(keynum)
-			keychar = string(keynum)
-			//fmt.Println(keychar)
-			keybyte = []byte(keychar)
-			key[i] = keybyte[0]
-			i++
-		} else {
-			continue
-		}
-	}
+	rand.Read(key)
 	return key
 }

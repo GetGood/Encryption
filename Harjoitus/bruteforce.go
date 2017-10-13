@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strconv"
 )
 
 func main() {
@@ -105,22 +104,7 @@ func decrypt(key []byte, text []byte) []byte {
 func generateKey(seed int) []byte {
 	rand.Seed(int64(seed))
 	key := make([]byte, 16)
-	keychar := ""
-	keybyte := make([]byte, 1)
-	keynum := 0
-
-	for i := 0; i < 16; {
-		keychar = (strconv.Itoa(rand.Int()))[0:3]
-		keynum, _ = strconv.Atoi(keychar)
-		if keynum > 0 && keynum < 128 {
-			keychar = string(keynum)
-			keybyte = []byte(keychar)
-			key[i] = keybyte[0]
-			i++
-		} else {
-			continue
-		}
-	}
+	rand.Read(key)
 	return key
 }
 
