@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -22,9 +21,8 @@ func main() {
 	useKeyPtr := flag.String("k", "", "option to use key file")
 	flag.Parse()
 
-	if *encryptPtr != "" && *useKeyPtr != "" {
-		originalpath := os.Args[2]
-		keypath := os.Args[4]
+	if *encryptPtr != "" {
+		originalpath := *encryptPtr
 		originaltext, err := ioutil.ReadFile(originalpath)
 		check(err)
 
@@ -32,38 +30,27 @@ func main() {
 		if originaltext[len(originaltext)-1] == 10 {
 			originaltext = originaltext[:len(originaltext)-1]
 		}
-		keyfile, err := ioutil.ReadFile(keypath)
-		key, err := hex.DecodeString(string(keyfile))
-		check(err)
-
-		ciphertext := encrypt(key, originaltext)
-		err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
-		check(err)
-
-	} else if *encryptPtr != "" && *useKeyPtr == "" {
-		originalpath := os.Args[2]
-		originaltext, err := ioutil.ReadFile(originalpath)
-		check(err)
-
-		// check for and remove line feed character LF
-		if originaltext[len(originaltext)-1] == 10 {
-			originaltext = originaltext[:len(originaltext)-1]
-		}
-		key := generateKey()
-		ciphertext := encrypt(key, originaltext)
-		err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
-		if err != nil {
-			panic(err)
-		}
-
-		err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
-		if err != nil {
-			panic(err)
-		}
+    if *useKeyPtr != "" {
+      keypath := *useKeyPtr
+		  keyfile, err := ioutil.ReadFile(keypath)
+      check(err)
+		  key, err := hex.DecodeString(string(keyfile))
+		  check(err)
+		  ciphertext := encrypt(key, originaltext)
+		  err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+		  check(err)
+    } else {
+      key := generateKey()
+      ciphertext := encrypt(key, originaltext)
+		  err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+		  check(err)
+		  err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
+      check(err)
+    }
 	} else if *decryptPtr != "" && *useKeyPtr != "" {
-		originalpath := os.Args[2]
-		filename := stripExtension(os.Args[2])
-		keypath := os.Args[4]
+		originalpath := *decryptPtr
+		filename := stripExtension(originalpath)
+		keypath := *useKeyPtr
 		originaltext, err := ioutil.ReadFile(originalpath)
 		check(err)
 
@@ -71,6 +58,7 @@ func main() {
 		if originaltext[len(originaltext)-1] == 10 {
 			originaltext = originaltext[:len(originaltext)-1]
 		}
+
 		keyfile, err := ioutil.ReadFile(keypath)
 		check(err)
 
@@ -146,7 +134,7 @@ func encrypt(key []byte, text []byte) []byte {
 	for i := 0; i < len(iv); {
 		ivchar = (strconv.Itoa(rand.Int()))[0:3]
 		ivnum, _ = strconv.Atoi(ivchar)
-		if ivnum > 32 && ivnum < 127 {
+		if ivnum > 0 && ivnum < 127 {
 			ivchar = string(ivnum)
 			ivbyte = []byte(ivchar)
 			iv[i] = ivbyte[0]
@@ -179,7 +167,7 @@ func generateKey() []byte {
 	for i := 0; i < 16; {
 		keychar = (strconv.Itoa(rand.Int()))[0:3]
 		keynum, _ = strconv.Atoi(keychar)
-		if keynum > 32 && keynum < 127 {
+		if keynum > 0 && keynum < 128 {
 			//fmt.Println(keynum)
 			keychar = string(keynum)
 			//fmt.Println(keychar)
