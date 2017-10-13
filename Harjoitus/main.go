@@ -30,23 +30,23 @@ func main() {
 		if originaltext[len(originaltext)-1] == 10 {
 			originaltext = originaltext[:len(originaltext)-1]
 		}
-    if *useKeyPtr != "" {
-      keypath := *useKeyPtr
-		  keyfile, err := ioutil.ReadFile(keypath)
-      check(err)
-		  key, err := hex.DecodeString(string(keyfile))
-		  check(err)
-		  ciphertext := encrypt(key, originaltext)
-		  err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
-		  check(err)
-    } else {
-      key := generateKey()
-      ciphertext := encrypt(key, originaltext)
-		  err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
-		  check(err)
-		  err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
-      check(err)
-    }
+		if *useKeyPtr != "" {
+			keypath := *useKeyPtr
+			keyfile, err := ioutil.ReadFile(keypath)
+			check(err)
+			key, err := hex.DecodeString(string(keyfile))
+			check(err)
+			ciphertext := encrypt(key, originaltext)
+			err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+			check(err)
+		} else {
+			key := generateKey()
+			ciphertext := encrypt(key, originaltext)
+			err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+			check(err)
+			err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
+			check(err)
+		}
 	} else if *decryptPtr != "" && *useKeyPtr != "" {
 		originalpath := *decryptPtr
 		filename := stripExtension(originalpath)
