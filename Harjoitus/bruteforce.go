@@ -112,7 +112,7 @@ func generateKey(seed int) []byte {
 	for i := 0; i < 16; {
 		keychar = (strconv.Itoa(rand.Int()))[0:3]
 		keynum, _ = strconv.Atoi(keychar)
-		if keynum > 32 && keynum < 127 {
+		if keynum > 0 && keynum < 128 {
 			keychar = string(keynum)
 			keybyte = []byte(keychar)
 			key[i] = keybyte[0]
