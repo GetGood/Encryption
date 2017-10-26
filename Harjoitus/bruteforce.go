@@ -32,6 +32,8 @@ func main() {
 		original = original[:len(original)-1]
 	}
 
+  cipherslice = cipherslice[32:]
+
 	ciphertext := hex.EncodeToString(cipherslice)
 	fmt.Println(ciphertext)
 

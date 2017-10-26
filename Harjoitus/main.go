@@ -3,12 +3,17 @@ package main
 import (
 	"crypto/aes"
 	"crypto/cipher"
+  "crypto/hmac"
+  "crypto/sha256"
 	"encoding/hex"
 	"flag"
 	"fmt"
+  "io"
+  "os"
 	"io/ioutil"
 	"log"
 	"math/rand"
+  cryptosecure "crypto/rand"
 	"strings"
 	"time"
 )
@@ -33,18 +38,35 @@ func main() {
 			keypath := *useKeyPtr
 			keyfile, err := ioutil.ReadFile(keypath)
 			check(err)
+
 			key, err := hex.DecodeString(string(keyfile))
 			check(err)
+
 			ciphertext := encrypt(key, originaltext)
-			err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+      completeMac := createHmac(ciphertext, key)
+
+      completeText := append(completeMac, ciphertext...)
+
+			err = ioutil.WriteFile("./"+originalpath+".lit", completeText, 0644)
 			check(err)
+
+      fmt.Println("Created encrypted file using key")
+
 		} else {
 			key := generateKey()
 			ciphertext := encrypt(key, originaltext)
-			err = ioutil.WriteFile("./"+originalpath+".lit", ciphertext, 0644)
+
+      completeMac := createHmac(ciphertext, key)
+
+      completeText := append(completeMac, ciphertext...)
+
+			err = ioutil.WriteFile("./"+originalpath+".lit", completeText, 0644)
 			check(err)
+
 			err = ioutil.WriteFile("key.lit", []byte(hex.EncodeToString(key)), 0644)
 			check(err)
+
+      fmt.Println("Created encrypted file and a new key")
 		}
 	} else if *decryptPtr != "" && *useKeyPtr != "" {
 		originalpath := *decryptPtr
@@ -64,11 +86,21 @@ func main() {
 		key, err := hex.DecodeString(string(keyfile))
 		check(err)
 
-		plaintext := decrypt(key, originaltext)
+    hmacHeader, textBytes := originaltext[:32], originaltext[32:]
+
+    if checkMac(textBytes, hmacHeader, key) != true {
+      fmt.Println("Integrity has been compromised!")
+      os.Exit(3)
+    } else {
+      fmt.Println("Message intact, proceeding")
+    }
+
+		plaintext := decrypt(key, textBytes)
 		err = ioutil.WriteFile("./"+filename, plaintext, 0644)
 		if err != nil {
 			panic(err)
 		}
+    fmt.Println("File decrypted")
 	} else {
 		fmt.Println("Invalid command line option, use")
 		fmt.Println("-d for decrypt, -e for encrypt, specify keyfile with -k")
@@ -90,7 +122,8 @@ func stripExtension(s string) string {
 }
 
 func decrypt(key []byte, text []byte) []byte {
-	block, err := aes.NewCipher(key)
+  fmt.Println("Decrypting data...")
+  block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
 	}
@@ -112,10 +145,8 @@ func decrypt(key []byte, text []byte) []byte {
 }
 
 func encrypt(key []byte, text []byte) []byte {
-	now := time.Now()
-	seed := (now.Nanosecond())
-	rand.Seed(int64(seed))
-	block, err := aes.NewCipher(key)
+	fmt.Println("Encrypting data...")
+  block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
 	}
@@ -125,7 +156,9 @@ func encrypt(key []byte, text []byte) []byte {
 	ciphertext := make([]byte, aes.BlockSize+len(text))
 	iv := ciphertext[:aes.BlockSize]
 
-	rand.Read(iv)
+	if _, err := io.ReadFull(cryptosecure.Reader, iv); err != nil {
+    panic(err)
+  }
 
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], text)
@@ -136,7 +169,37 @@ func encrypt(key []byte, text []byte) []byte {
 	return ciphertext
 }
 
+func createHmac(ciphertext []byte, key []byte) []byte {
+  fmt.Println("Creating HMAC...")
+  hashSlice := append(ciphertext, key...)
+
+  macKeyHash := sha256.New()
+  macKeyHash.Write(key)
+  macKey := macKeyHash.Sum(nil)
+
+  mac := hmac.New(sha256.New, macKey)
+  mac.Write(hashSlice)
+  completeMac := mac.Sum(nil)
+  return completeMac
+}
+
+func checkMac(originaltext []byte, hmacHeader []byte, key []byte) bool {
+  fmt.Println("Checking data integrity...")
+  hashSlice := append(originaltext, key...)
+
+  macKeyHash := sha256.New()
+  macKeyHash.Write(key)
+  macKey := macKeyHash.Sum(nil)
+
+  mac := hmac.New(sha256.New, macKey)
+  mac.Write(hashSlice)
+  expectedMac := mac.Sum(nil)
+  return hmac.Equal(hmacHeader, expectedMac)
+}
+
+
 func generateKey() []byte {
+  fmt.Println("Generating key...")
 	now := time.Now()
 	seed := (now.Nanosecond())
 	fmt.Println("seed:", seed)
