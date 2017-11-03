@@ -36,6 +36,7 @@ litaecrypt -d {filename} -k {keyfile}
 ## 3	The vulnerability
 
 ###### 3.1 About stateful PRNGs
+Pseudorandom number generators are algorithms that generate a sequence of numbers whose properties only mimics the properties of truly random sequences. The reason why the PRNG doesn’t produce truly random number sequence is that it’s completely determined by the initial value, called seed. The seed determines the initial starting state of PRNG, it can be set to any arbitrary number (often current system time by milliseconds is used). It will always produce the same sequence of numbers when the same state is used to initialize. Therefore if the method of producing the key is known, in the case of Litaecrypt the basic rand() function, the key can be obtained by brute forcing the initial seed, if the plaintext and ciphertext are also known.
 ###### 3.2 Exploiting Litaecrypt
 ###### 3.2 About cryptographically safe PRNGs
 ###### 3.4 Fixing the vulnerability
