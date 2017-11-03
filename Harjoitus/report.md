@@ -8,9 +8,7 @@ Mikko Seppänen
 Matti Ruusupiha & Mikko Seppänen
 Version 1.0
 ###### 1.2	Introduction
-Litaecrypt is a command line tool for encrypting and decrypting files.
-It uses 128-bit AES and insecure key generation. Originals of the encrypted files are not deleted.
-The encrypted files use the .lit -extension.
+In this assignment we decided to make an encryption software with a known vulnerability, explain why it’s vulnerable and how to make it secure. For the programming we used the Go programming language. The program was named Litaecrypt. Litaecrypt is a command line tool for encrypting and decrypting files. It uses 128-bit AES for encryption. Originals of the encrypted files are not deleted. The encrypted files use the .lit -extension. The vulnerability comes from using a cryptographically insecure random function for generating the key, more on the random functions later.
 ###### 1.3	Installation
 Litaecrypt is a standalone program that doesn’t require additional files.
 There are binaries for 64 and 32-bit Windows or Linux operating systems.
