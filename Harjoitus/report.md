@@ -31,7 +31,7 @@ litaecrypt -d {filename} -k {keyfile}
 ## 2	Architechture of Litaecrypt
 
 ###### 2.1 Architecture flowchart
-![program architecture](https://github.com/SilentProcess/Encryption/blob/master/Harjoitus/architecture.PNG)
+![program architecture](architecture.PNG)
 
 ## 3	The vulnerability
 
