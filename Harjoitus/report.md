@@ -30,6 +30,12 @@ litaecrypt -d {filename} -k {keyfile}
 ## 2	Architechture of Litaecrypt
  
 ## 3	The vulnerability
+
+###### 3.1 About stateful PRNGs
+###### 3.2 Exploiting Litaecrypt
+###### 3.2 About cryptographically safe PRNGs
+###### 3.4 Fixing the vulnerability
+
 Kerrotaan vulnista
 Avainsanoja:
 Cryptographically secure pseudorandom number generator (CSPRNG)
