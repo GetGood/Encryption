@@ -13,8 +13,8 @@ In this assignment we decided to make an encryption software with a known vulner
 Litaecrypt is a standalone program that doesn’t require additional files.
 There are binaries for 64 and 32-bit Windows or Linux operating systems.
 User simply navigates to the folder where the program file is located with a command prompt
-or shell such as PowerShell or Bash and runs the program.
-(LISÄÄ TÄHÄN DOWNLOAD LINKIT BINÄÄREIHIN)
+or shell such as PowerShell or Bash and runs the program.  
+**(LISÄÄ TÄHÄN DOWNLOAD LINKIT BINÄÄREIHIN)**
 ###### 1.4	Usage
 For file encryption, generating a new key file:
 ```
