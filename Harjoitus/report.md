@@ -28,7 +28,10 @@ For file decryption
 litaecrypt -d {filename} -k {keyfile}
 ```
 ## 2	Architechture of Litaecrypt
- 
+
+###### 2.1 Architecture flowchart
+![program architecture](https://github.com/SilentProcess/Encryption/blob/master/Harjoitus/architecture.PNG)
+
 ## 3	The vulnerability
 
 ###### 3.1 About stateful PRNGs
