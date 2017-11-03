@@ -18,11 +18,17 @@ User simply navigates to the folder where the program file is located with a com
 or shell such as PowerShell or Bash and runs the program.
 ###### 1.4	Usage
 For file encryption, generating a new key file:
+```
 litaecrypt -e {filename}
+```
 For file encryption, using an existing key file:
+```
 litaecrypt -e {filename} -k {keyfile}
+```
 For file decryption
+```
 litaecrypt -d {filename} -k {keyfile}
+```
 ## 2	Architechture of Litaecrypt
  
 ## 3	The vulnerability
