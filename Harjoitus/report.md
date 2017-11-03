@@ -1,8 +1,7 @@
 # Encryption Techniques
 ## Litaecrypt
-
-## Matti Ruusupiha
-## Mikko Seppänen
+Matti Ruusupiha
+Mikko Seppänen
 
 ## 1	Litaecrypt program documentation
 ###### 1.1	Authors and version
