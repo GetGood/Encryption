@@ -9,7 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
-  "time"
+	"time"
 )
 
 func main() {
@@ -52,14 +52,14 @@ func check(e error) {
 func bruteforce(original []byte, cipher string) {
 	// bruteforcing all possible keys
 	// very simplistic progress bar
-  start := time.Now()
+	start := time.Now()
 	for i := 0; i <= 999999999; i++ {
-    if i%10000 == 0 && i != 0 {
-      t := time.Now()
-      elapsed := t.Sub(start)
-      fmt.Println("10000 rounds in", elapsed)
-      start = time.Now()
-    }
+		if i%10000 == 0 && i != 0 {
+			t := time.Now()
+			elapsed := t.Sub(start)
+			fmt.Println("10000 rounds in", elapsed)
+			start = time.Now()
+		}
 
 		key := generateKey(i)
 		testcipher, err := hex.DecodeString(cipher)
