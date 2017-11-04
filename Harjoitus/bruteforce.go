@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+  "time"
 )
 
 func main() {
@@ -35,7 +36,6 @@ func main() {
 	cipherslice = cipherslice[32:]
 
 	ciphertext := hex.EncodeToString(cipherslice)
-	fmt.Println(ciphertext)
 
 	// feed the cipher slice to function as string.
 	// it will be decoded later
@@ -52,12 +52,14 @@ func check(e error) {
 func bruteforce(original []byte, cipher string) {
 	// bruteforcing all possible keys
 	// very simplistic progress bar
-	fmt.Println("___________________ Done")
-	fmt.Print(":")
-	for i := 1; i <= 999999999; i++ {
-		if i%50000000 == 0 {
-			fmt.Print(":")
-		}
+  start := time.Now()
+	for i := 0; i <= 999999999; i++ {
+    if i%10000 == 0 && i != 0 {
+      t := time.Now()
+      elapsed := t.Sub(start)
+      fmt.Println("10000 rounds in", elapsed)
+      start = time.Now()
+    }
 
 		key := generateKey(i)
 		testcipher, err := hex.DecodeString(cipher)
