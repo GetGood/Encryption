@@ -54,11 +54,12 @@ Estimated time to compute all keys: 26 days 3 hours 52 minutes 43 seconds
 ###### 3.2 About cryptographically safe PRNGs
 Cryptographically safe PRNGs or CSPRNGs operate much like the PRNGs, except they are seeded with more unpredictable data and have stricter qualifications for the data they produce. The output bits of a CSPRNG must not be predictable at higher than 50% succsess rate, and the past outputs must not be predictable from the observed outputs.  
 
-On Linux machines, the device /dev/urandom is most often used. It collects a pool of entropy from various hard-to-predict data sources, such as key presses or inter-interrupt timings. This data is then used to seed a ChaCha20-based CRNG, that is essentially a stream cipher with a 256-bit key producing an endless output of cryptographically secure data. This explanation is a simplification and does
-not accurately completely describe what goes on in the linux kernel.
+On Linux machines, the device /dev/urandom is most often used. It collects a pool of entropy from various hard-to-predict data sources, such as key presses or inter-interrupt timings. This data is then used to seed a ChaCha20-based CRNG, that is essentially a stream cipher with a 256-bit key producing an endless output of cryptographically secure data. 
 
 On Windows the standard CSPRNG is the CryptGenRandom handle. Much like /dev/urandom it is initialized with hard-to-predict data from various sources, including but not limited to high-precision performance counters, hash of the users enviroment block and internal
-CPU counters. For the PRNG part of the CSPRNG Microsoft uses an "implementation of the AES counter-mode based PRNG specified in NIST Special Publication 800-90".
+CPU counters. For the PRNG part of the CSPRNG Microsoft uses an "implementation of the AES counter-mode based PRNG specified in NIST Special Publication 800-90".  
+
+These explanations are a simplifications and do not accurately completely describe what goes on in the Linux or Windows kernel.
 
 ###### 3.4 Fixing the vulnerability
 Knowing all this, we can deduce that the vulnerability of the program can be fixed by generating the key from cryptographically secure
