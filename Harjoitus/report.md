@@ -53,11 +53,5 @@ Estimated time to compute all keys: 26 days 3 hours 52 minutes 43 seconds
 
 ###### 3.2 About cryptographically safe PRNGs
 ###### 3.4 Fixing the vulnerability
-
-Kerrotaan vulnista
-Avainsanoja:
-Cryptographically secure pseudorandom number generator (CSPRNG)
-Pseudorandom number generator (PRNG), deterministic
-/dev/urandom (Linux)
-CryptGenRandom API (Windows)
-rand.Read and crypto rand.Read
+Knowing all this, we can deduce that the vulnerability of the program can be fixed by generating the key from cryptographically secure
+random numbers. In Golang this is pretty straightforward; replace the math/rand function rand.Read with crypto/rand function rand.Read, which instead of using the languages own PRNG, reads the operating systems CSPRNG. In binaries created for Linux it reads bytes from /dev/urandom, and on Windows it uses the CryptGenRandom API.
