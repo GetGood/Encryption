@@ -59,7 +59,7 @@ On Linux machines, the device /dev/urandom is most often used. It collects a poo
 On Windows the standard CSPRNG is the CryptGenRandom handle. Much like /dev/urandom it is initialized with hard-to-predict data from various sources, including but not limited to high-precision performance counters, hash of the users enviroment block and internal
 CPU counters. For the PRNG part of the CSPRNG Microsoft uses an "implementation of the AES counter-mode based PRNG specified in NIST Special Publication 800-90".  
 
-These explanations are a simplifications and do not accurately completely describe what goes on in the Linux or Windows kernel. The CSPRNGs described here are accurate for Linux Kernels from 4.8 forward and for Windows kernels from Windows Vista SP1 forward at
+These explanations are a simplifications and do not accurately completely describe what goes on in the Linux or Windows kernel. The CSPRNGs described here are accurate for Linux kernels from 4.8 forward and for Windows kernels from Windows Vista SP1 forward at
 the time of writing.
 
 ###### 3.4 Fixing the vulnerability
