@@ -41,6 +41,42 @@ litaecrypt -d {filename} -k {keyfile}
 ###### 2.1 Architecture flowchart
 ![program architecture](architecture.PNG)
 
+###### 2.2 Functions
+
+**check** is for basic error handling. Logs the error that occured with associated function.  
+
+**stripExtension** removes everything from a string after the "." -character. It's used to convert encrypted files
+back to their original form (stripping the .lit -extension).  
+
+**decrypt** takes 2 slices of bytes as arguments, the key and the ciphertext. IV is parsed and used to decrypt the ciphertext together
+with the key. Uses golangs in-built functions for AES CFB-mode decryption.
+
+**encrypt** takes 2 slices of bytes as arguments, the key and the plaintext. It uses golangs in-built function to create a new AES block. 
+IV is included in the beginning of the ciphertext and is filled with bytes from either /dev/urandom or CryptGenRandom depending on
+the OS used. After that a new AES encrypter running in CFB mode is created and used to encrypt the plaintext.    
+
+**createHmac** takes 2 slices of bytes as arguments, the ciphertext and the AES key. It appends the key to the end of the ciphertext. 
+Then it creates a new 256-bit by taking a SHA-256 hash from the original AES key. After that it creates a new hmac_sha256 value
+from the ciphertext+key byte slice using the newly created 256-bit key. This value is prepended to the encrypted file.
+
+**checkMac** takes 3 slices of bytes as arguments; the hmac_256 hash parsed from the beginning of the file, the remaining ciphertext and
+the AES key. It creates a SHA-256 hash of the AES key, uses that to calculate a new hmac_256 value from the ciphertext and compares
+it to the hmac_256 value parsed from the beginning of the encrypted file. If the values match, the encrypted file has remained unchanged.  
+
+**generateKey** seeds the math/rand with time.now.Nanosecond and then reads 16 bytes from math/rands PRNG to generate the 128-bit AES key.
+
+**main** parses the supplied command line flags. If the right flags are specified, main either encrypts with a provided key, encrypts with a
+newly geneareted key or decrypts with a provided key.  
+
+Both encrypts follow the same pattern with the exception of key generation. The pattern goes as follows: Read plaintext into a slice of
+bytes. Either read a keyfile and transform the hex-encoded string into a slice of bytes, or generate a new key with **generateKey**. Use
+**encrypt** to create the ciphertext. Call **createHmac** to generate a new hmac_256 hash and prepend it the ciphertext. Write the ciphertext to
+a file called {original file name}.lit. If a new key was generated, write it to a file called key.lit.  
+
+If the decrypt flag is set, the program first calls **stripExtension** to prepare the unencrypted file filename. After that the key is read
+from the keyfile and the hex-encoded string is transformed to a slice of bytes. Then **checkMac** is called to verify data integrity. If
+the data is intact, **decrypt** is called to decrypt the ciphertext. After that the decrypted bytes are written to a file called {original filename}.  
+
 ## 3	The vulnerability
 
 ###### 3.1 About stateful PRNGs
