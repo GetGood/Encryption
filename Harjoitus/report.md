@@ -99,6 +99,8 @@ Processor: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz
 Average computing time for 10000 keys: 22,60386205 seconds  
 Estimated time to compute all keys: 26 days 3 hours 52 minutes 43 seconds  
 
+[Watch a video of litaecrypt and bruteforce in action](https://silentprocess.github.io/litaecrypt/)  
+
 ###### 3.2 About cryptographically safe PRNGs
 Cryptographically safe PRNGs or CSPRNGs operate much like the PRNGs, except they are seeded with more unpredictable data and have stricter qualifications for the data they produce. The output bits of a CSPRNG must not be predictable at higher than 50% success rate, and the past outputs must not be predictable from the observed outputs.  
 
