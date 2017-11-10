@@ -20,7 +20,7 @@ Download litaecrypt for windows or linux
 [For 64-bit linux](litaecrypt_64)  
 [For 32-bit linux](litaecrypt_32)  
 
-[for 64-bit Windows](litaecrypt_64.exe)  
+[For 64-bit Windows](litaecrypt_64.exe)  
 [For 32-bit linux](litaecrypt_32.exe)  
 
 ###### 1.4	Usage
