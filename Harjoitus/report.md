@@ -90,6 +90,10 @@ After encrypted file and the corresponding plaintext has been aquired, the attac
 
 We created a proof-of-concept program in Golang to try the bruteforcing in practise.  
 
+![encrypt picture](Create_encrypted_picture.PNG)  
+
+![bruteforce file](Bruteforcing_timestamps.PNG)
+
 Picture: 171KB test_picture.jpg  
 Processor: Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz  
 Average computing time for 10000 keys: 22,60386205 seconds  
