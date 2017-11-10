@@ -14,7 +14,15 @@ Litaecrypt is a standalone program that doesn’t require additional files.
 There are binaries for 64 and 32-bit Windows or Linux operating systems.
 User simply navigates to the folder where the program file is located with a command prompt
 or shell such as PowerShell or Bash and runs the program.  
-**(LISÄÄ TÄHÄN DOWNLOAD LINKIT BINÄÄREIHIN)**
+
+Download litaecrypt for windows or linux
+
+[For 64-bit linux](litaecrypt_64)  
+[For 32-bit linux](litaecrypt_32)  
+
+[for 64-bit Windows](litaecrypt_64.exe)  
+[For 32-bit linux](litaecrypt_32.exe)  
+
 ###### 1.4	Usage
 For file encryption, generating a new key file:
 ```
