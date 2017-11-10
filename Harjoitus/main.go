@@ -201,7 +201,6 @@ func generateKey() []byte {
 	fmt.Println("Generating key...")
 	now := time.Now()
 	seed := (now.Nanosecond())
-	fmt.Println("seed:", seed)
 	rand.Seed(int64(seed))
 	key := make([]byte, 16)
 	rand.Read(key)
