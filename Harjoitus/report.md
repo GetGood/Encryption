@@ -94,6 +94,8 @@ After encrypted file and the corresponding plaintext has been aquired, the attac
 
 We created a proof-of-concept program in Golang to try the bruteforcing in practise.  
 
+[View Bruteforcer source code](bruteforce.go)
+
 ![encrypt picture](Create_encrypted_picture.PNG)  
 
 ![bruteforce file](Bruteforcing_timestamps.PNG)
