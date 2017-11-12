@@ -38,10 +38,14 @@ litaecrypt -d {filename} -k {keyfile}
 ```
 ## 2	Architechture of Litaecrypt
 
-###### 2.1 Architecture flowchart
+###### 2.1 Source code
+
+[View Litaecrypt source code](main.go)
+
+###### 2.2 Architecture flowchart
 ![program architecture](architecture.PNG)
 
-###### 2.2 Functions
+###### 2.3 Functions
 
 **check** is for basic error handling. Logs the error that occured with associated function.  
 
