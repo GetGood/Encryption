@@ -55,9 +55,12 @@ back to their original form (stripping the .lit -extension).
 **decrypt** takes 2 slices of bytes as arguments, the key and the ciphertext. IV is parsed and used to decrypt the ciphertext together
 with the key. Uses golangs in-built functions for AES CFB-mode decryption.
 
-**encrypt** takes 2 slices of bytes as arguments, the key and the plaintext. It uses golangs in-built function to create a new AES block. 
+**encrypt** takes 2 slices of bytes as arguments, the key and the plaintext. It uses golangs in-built function to create a new AES
+block. 
 IV is included in the beginning of the ciphertext and is filled with bytes from either /dev/urandom or CryptGenRandom depending on
-the OS used. After that a new AES encrypter running in CFB mode is created and used to encrypt the plaintext.    
+the OS used. After that a new AES encrypter running in CFB mode is created and used to encrypt the plaintext. CFB mode was chosen 
+arbitrarily, GCM and CTR would have suited our needs also. We have hmac functions separated from the encryption process for data
+integrity checking.
 
 **createHmac** takes 2 slices of bytes as arguments, the ciphertext and the AES key. It appends the key to the end of the ciphertext. 
 Then it creates a new 256-bit by taking a SHA-256 hash from the original AES key. After that it creates a new hmac_sha256 value
@@ -108,9 +111,10 @@ Estimated time to compute all keys: 26 days 3 hours 52 minutes 43 seconds
 [Watch a video of litaecrypt and bruteforce in action](https://silentprocess.github.io/litaecrypt/)  
 
 ###### 3.2 About cryptographically safe PRNGs
-Cryptographically safe PRNGs or CSPRNGs operate much like the PRNGs, except they are seeded with more unpredictable data and have stricter qualifications for the data they produce. The output bits of a CSPRNG must not be predictable at higher than 50% success rate, and the past outputs must not be predictable from the observed outputs.  
+Cryptographically safe PRNGs or CSPRNGs operate much like the PRNGs, except they are seeded with more unpredictable data and have stricter qualifications for the data they produce. The output bits of a CSPRNG must not be predictable at higher than 50% success rate, and the past or future outputs must not be predictable from the observed outputs.  
 
-On Linux machines, the device /dev/urandom is most often used. It collects a pool of entropy from various hard-to-predict data sources, such as key presses or inter-interrupt timings. This data is then used to seed a ChaCha20-based CRNG, that is essentially a stream cipher with a 256-bit key producing an endless output of cryptographically secure data. 
+On Linux machines, the device /dev/urandom is most often used. It collects a pool of entropy from various hard-to-predict data sources, such as key presses or inter-interrupt timings. This data is then used to seed a ChaCha20-based CRNG, which is essentially a stream
+cipher and provides the user with a very large number of cryptographically secure bytes.   
 
 On Windows the standard CSPRNG is the CryptGenRandom handle. Much like /dev/urandom it is initialized with hard-to-predict data from various sources, including but not limited to high-precision performance counters, hash of the users enviroment block and internal
 CPU counters. For the PRNG part of the CSPRNG Microsoft uses an "implementation of the AES counter-mode based PRNG specified in NIST Special Publication 800-90".  
