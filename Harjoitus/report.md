@@ -124,4 +124,16 @@ the time of writing.
 
 ###### 3.4 Fixing the vulnerability
 Knowing all this, we can deduce that the vulnerability of the program can be fixed by generating the key from cryptographically secure
-random numbers. In Golang this is pretty straightforward; replace the math/rand function rand.Read with crypto/rand function rand.Read, which instead of using the languages own PRNG, reads the operating systems CSPRNG. In binaries created for Linux it reads bytes from /dev/urandom, and on Windows it uses the CryptGenRandom API.
+random numbers. In Golang this is pretty straightforward; replace the math/rand function rand.Read with crypto/rand function rand.Read, which instead of using the languages own PRNG, reads the operating systems CSPRNG. In binaries created for Linux it reads bytes from /dev/urandom, and on Windows it uses the CryptGenRandom API.   
+
+Fix example (replace generateKey() function with this):
+```
+func generateKey() []byte {
+	fmt.Println("Generating key...")
+	key := make([]byte, 16)
+	if _, err := io.ReadFull(cryptosecure.Reader, key); err != nil {
+		panic(err)
+	}
+	return key
+}
+```
