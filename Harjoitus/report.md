@@ -63,14 +63,14 @@ arbitrarily, GCM and CTR would have suited our needs also. We have hmac function
 integrity checking.
 
 **createHmac** takes 2 slices of bytes as arguments, the ciphertext and the AES key. It appends the key to the end of the ciphertext. 
-Then it creates a new 256-bit by taking a SHA-256 hash from the original AES key. After that it creates a new hmac_sha256 value
+Then it creates a new 256-bit key by taking an SHA-256 hash from the original AES key. After that it creates a new hmac_sha256 value
 from the ciphertext+key byte slice using the newly created 256-bit key. This value is prepended to the encrypted file.
 
 **checkMac** takes 3 slices of bytes as arguments; the hmac_256 hash parsed from the beginning of the file, the remaining ciphertext and
-the AES key. It creates a SHA-256 hash of the AES key, uses that to calculate a new hmac_256 value from the ciphertext and compares
+the AES key. It creates an SHA-256 hash of the AES key, uses that to calculate a new hmac_256 value from the ciphertext and compares
 it to the hmac_256 value parsed from the beginning of the encrypted file. If the values match, the encrypted file has remained unchanged.  
 
-**generateKey** seeds the math/rand with time.now.Nanosecond and then reads 16 bytes from math/rands PRNG to generate the 128-bit AES key.
+**generateKey** seeds the math/rand with time.now.Nanosecond() and then reads 16 bytes from math/rands PRNG to generate the 128-bit AES key.
 
 **main** parses the supplied command line flags. If the right flags are specified, main either encrypts with a provided key, encrypts with a
 newly geneareted key or decrypts with a provided key.  
@@ -124,7 +124,7 @@ the time of writing.
 
 ###### 3.4 Fixing the vulnerability
 Knowing all this, we can deduce that the vulnerability of the program can be fixed by generating the key from cryptographically secure
-random numbers. In Golang this is pretty straightforward; replace the math/rand function rand.Read with crypto/rand function rand.Read, which instead of using the languages own PRNG, reads the operating systems CSPRNG. In binaries created for Linux it reads bytes from /dev/urandom, and on Windows it uses the CryptGenRandom API.   
+random numbers, because that increases the number of possible keys to 3.4x10^38 instead of the the earlier 1x10^10. In Golang this is pretty straightforward; replace the math/rand function rand.Read with crypto/rand function rand.Read, which instead of using the languages own PRNG, reads the operating systems CSPRNG. In binaries created for Linux it reads bytes from /dev/urandom, and on Windows it uses the CryptGenRandom API.   
 
 Fix example (replace **generateKey()** function with this):
 ```
